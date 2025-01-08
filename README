@@ -1,0 +1,62 @@
+__/\\\_______________/\\\\\\\\\\\\\\\________/\\\\\________/\\\\______/\\\\\\\\\\\___        
+ _\/\\\______________\/\\\///////////_______/\\\///\\\_____\///\\____/\\\/////////\\\_       
+  _\/\\\______________\/\\\________________/\\\/__\///\\\____/\\/____\//\\\______\///__      
+   _\/\\\______________\/\\\\\\\\\\\_______/\\\______\//\\\__\//_______\////\\\_________     
+    _\/\\\______________\/\\\///////_______\/\\\_______\/\\________________\////\\\______    
+     _\/\\\______________\/\\\______________\//\\\______/\\\___________________\////\\\___   
+      _\/\\\______________\/\\\_______________\///\\\__/\\\______________/\\\______\//\\\__  
+       _\/\\\\\\\\\\\\\\\__\/\\\\\\\\\\\\\\\_____\///\\\\\/______________\///\\\\\\\\\\\/___ 
+        _\///////////////___\///////////////________\/////__________________\///////////_____
+
+Project 4 README:
+
+folder contents:
+	- tls.c (custom implementation of thread-local storage in user space)
+	- tls.h (header file for tls.c used for implementation and testing)
+	- test_tls.c (used to test tls.c)
+	- Makefile (Makefile for tls.c that compiles the tls.o object file)
+	- README (this file)
+
+description: 
+	 - A user-level thread-local storage (TLS) library in C, providing thread-specific
+	   memory management with custom memory mapping and reference counting.
+	 - Implements TLS with mmap to allocate private memory pages for each thread.
+	 - TLS data is managed through a Thread Local Storage (TLS) Control Block (similar to
+	   a TCB in pthreads), which contains thread-specific data and a reference count for 
+	   each memory page.
+	 - Threads can have their own TLS allocated dynamically, with memory pages protected 
+	   using mprotect to ensure proper access control.
+	 - The library handles thread-specific data using signal handlers to intercept 
+	   segmentation faults (SIGSEGV), ensuring that invalid memory accesses are caught and 
+	   processed.i
+
+function list:
+	 - tls_create(size_t size): Allocates thread-local storage for the current thread with a 
+	   specified size. Memory is divided into pages.
+	 - tls_clone(pthread_t tid): Creates a new TLS for the calling thread by cloning the TLS
+	   of the thread identified by tid. Memory pages are shared with the cloned thread but 
+	   managed through reference counts.
+	 - tls_destroy(): Frees the TLS memory of the calling thread, unmapping any memory pages
+	   when the reference count reaches zero.
+	 - tls_write(unsigned int offset, unsigned int length, char *buffer): Writes data to the
+	   TLS memory, handling page splits and memory protection.
+	 - tls_read(unsigned int offset, unsigned int length, char *buffer): Reads data from the
+	   TLS memory, ensuring proper memory protection.
+	 - initialize_signal_handler(): Sets up a signal handler to catch and process
+	   segmentation faults (SIGSEGV) related to invalid TLS access.
+	 - tls_handle_segfault(int sig, siginfo_t *si, void *context): Signal handler for
+	   segmentation faults. Exits the thread if the fault occurs within its TLS area.
+
+bibliography:
+	 - Linux man pages
+	 - Geeks for Geeks
+	 - IBM docs
+
+parts which gave me a migraine:
+	 - I was unable to solve test cases 3,4, and 6 in time for this submission, the tls_write
+	   function would stall when trying to write after cloning, and I could not figure out
+	   how to fix that in time. 
+	 - All of those test cases are related to CoW, which even after vbery thorough research
+	   I could not figure out what went wrong with my implementation. 
+	 - Even though this wasn't the shortest assignment when it comes to time I did feel
+	   pressed for time due to trying to prep for the holidays. 
